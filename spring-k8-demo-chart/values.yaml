@@ -1,6 +1,6 @@
 httpRoute:
   enabled: false
-  
+
 replicaCount: 2
 
 image:
@@ -66,3 +66,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+persistence:
+  size: 1Gi
