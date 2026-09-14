@@ -1,0 +1,33 @@
+name: Spring Boot CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build and Test
+        run: mvn clean verify
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-k8-demo-jar
+          path: target/*.jar
