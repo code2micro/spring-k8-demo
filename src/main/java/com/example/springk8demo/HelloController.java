@@ -37,4 +37,17 @@ public class HelloController {
     public Map<String, String> configuredMessage() {
         return Map.of("message", configuredMessage);
     }
+
+    @GetMapping("/password")
+    public Map<String, String> password() {
+    return Map.of(
+        "password",
+        System.getenv("DB_PASSWORD")
+    );
+   
+    }
+    @GetMapping("/test123")
+    public String test123() {
+        return "TEST123";
+    }
 }

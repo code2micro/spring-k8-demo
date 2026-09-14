@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: spring-k8-demo
-        image: spring-k8-demo:latest
+        image: spring-k8-demo:v2
         imagePullPolicy: Never
 
         env:
@@ -28,6 +28,11 @@ spec:
             configMapKeyRef:
               name: spring-config
               key: APP_MESSAGE
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: DB_PASSWORD
 
         ports:
         - containerPort: 8080
