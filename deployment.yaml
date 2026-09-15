@@ -28,6 +28,7 @@ spec:
             configMapKeyRef:
               name: spring-config
               key: APP_MESSAGE
+
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -36,3 +37,17 @@ spec:
 
         ports:
         - containerPort: 8080
+
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
