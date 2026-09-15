@@ -5,3 +5,4 @@ target/
 .classpath
 .project
 .settings/
+minikube-linux-amd64
