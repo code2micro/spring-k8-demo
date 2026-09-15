@@ -6,7 +6,7 @@ replicaCount: 2
 image:
   repository: spring-k8-demo
   pullPolicy: Never
-  tag: "v2"
+  tag: "v4"
 
 imagePullSecrets: []
 
