@@ -6,3 +6,6 @@ target/
 .project
 .settings/
 minikube-linux-amd64
+lazygit
+lazygit.tar.gz
+*.tar
