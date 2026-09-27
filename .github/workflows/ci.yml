@@ -8,11 +8,20 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api-gateway, inventory-service, order-service]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -22,12 +31,27 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: maven
 
-      - name: Build and Test
-        run: mvn clean verify
+      - name: Build and Test ${{ matrix.service }}
+        run: mvn -B clean verify --file ${{ matrix.service }}/pom.xml
 
-      - name: Upload JAR
+      - name: Upload JAR ${{ matrix.service }}
         uses: actions/upload-artifact@v4
         with:
-          name: spring-k8-demo-jar
-          path: target/*.jar
+          name: ${{ matrix.service }}-jar
+          path: ${{ matrix.service }}/target/*.jar
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
