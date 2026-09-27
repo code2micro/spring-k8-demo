@@ -11,3 +11,9 @@ lazygit.tar.gz
 *.tar
 *.geanywb
 spring-k8-demo
+*.geanywb
+*.geany
+spring-k8-demo
+minikube-linux-amd64
+*.tar
+target/
