@@ -13,9 +13,19 @@ public class OrderEventConsumer {
     }
 
     @KafkaListener(topics = "order-placed-topic", groupId = "inventory-group")
-    public void handleOrderPlaced(OrderPlacedEvent event) {
-        System.out.println("<<< Received order event: " + event);
-        boolean ok = inventoryService.decrementStock(event.itemId(), event.quantity());
-        System.out.println(ok ? "Stock decremented OK" : "Stock decrement FAILED");
-    }
+	public void handleOrderPlaced(OrderPlacedEvent event) {
+		System.out.println("<<< Received order event: " + event);
+
+		ProcessResult result = inventoryService.processOrder(
+			event.orderId(),
+			event.itemId(),
+			event.quantity()
+		);
+
+		switch (result) {
+			case PROCESSED   -> System.out.println("Stock decremented OK");
+			case DUPLICATE   -> System.out.println("Skipped duplicate order: " + event.orderId());
+			case OUT_OF_STOCK -> System.out.println("Insufficient stock for: " + event.itemId());
+		}
+}
 }
