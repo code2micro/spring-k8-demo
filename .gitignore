@@ -17,3 +17,5 @@ spring-k8-demo
 minikube-linux-amd64
 *.tar
 target/
+*.zip
+spring-k8-demo.zip
