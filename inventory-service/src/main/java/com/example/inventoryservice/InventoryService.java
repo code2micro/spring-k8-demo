@@ -1,5 +1,8 @@
 package com.example.inventoryservice;
 
+import java.time.LocalDateTime;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,13 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryService {
 
     private final InventoryRepository repo;
-
     private final ProcessedOrderRepository processedOrderRepo;
 
-	public InventoryService(InventoryRepository repo, ProcessedOrderRepository processedOrderRepo) {
-		this.repo = repo;
-		this.processedOrderRepo = processedOrderRepo;
-	}
+    public InventoryService(InventoryRepository repo, ProcessedOrderRepository processedOrderRepo) {
+        this.repo = repo;
+        this.processedOrderRepo = processedOrderRepo;
+    }
 
     public int getStock(String itemId) {
         return repo.findById(itemId).map(InventoryItem::getQuantity).orElse(0);
@@ -34,20 +36,14 @@ public class InventoryService {
             return true;
         }).orElse(false);
     }
-    @Transactional
-	public ProcessResult processOrder(String orderId, String itemId, int quantity) {
-    // Step 1: Try to record this orderId. If it exists, the DB throws.
-    try {
-        processedOrderRepo.saveAndFlush(new ProcessedOrder(orderId, LocalDateTime.now()));
-    } catch (DataIntegrityViolationException e) {
-        return ProcessResult.DUPLICATE;
-    }
 
-    // Step 2: Only reached on first-time processing
-    boolean ok = decrementStock(itemId, quantity);
-    return ok ? ProcessResult.PROCESSED : ProcessResult.OUT_OF_STOCK;
-	}
-	public enum ProcessResult {
-    PROCESSED, DUPLICATE, OUT_OF_STOCK
-}
+    @Transactional
+    public ProcessResult processOrder(String orderId, String itemId, int quantity) {
+        if (processedOrderRepo.existsById(orderId)) {
+            return ProcessResult.DUPLICATE;
+        }
+        processedOrderRepo.save(new ProcessedOrder(orderId, LocalDateTime.now()));
+        boolean ok = decrementStock(itemId, quantity);
+        return ok ? ProcessResult.PROCESSED : ProcessResult.OUT_OF_STOCK;
+    }
 }
