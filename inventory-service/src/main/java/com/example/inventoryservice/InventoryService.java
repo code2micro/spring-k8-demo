@@ -1,36 +1,34 @@
 package com.example.inventoryservice;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryService {
 
-    private final Map<String, Integer> stock = new ConcurrentHashMap<>();
+    private final InventoryRepository repo;
 
-    public InventoryService() {
-        // Seed some initial stock for testing
-        stock.put("item-1", 10);
-        stock.put("item-2", 5);
-        stock.put("item-3", 0);
+    public InventoryService(InventoryRepository repo) {
+        this.repo = repo;
     }
 
     public int getStock(String itemId) {
-        return stock.getOrDefault(itemId, 0);
+        return repo.findById(itemId).map(InventoryItem::getQuantity).orElse(0);
     }
 
     public void setStock(String itemId, int quantity) {
-        stock.put(itemId, quantity);
+        repo.save(new InventoryItem(itemId, quantity));
     }
 
+    @Transactional
     public boolean decrementStock(String itemId, int quantity) {
-        return stock.computeIfPresent(itemId, (id, current) -> {
-            if (current < quantity) {
-                return current; // not enough stock — leave unchanged
+        return repo.findById(itemId).map(item -> {
+            if (item.getQuantity() < quantity) {
+                return false;
             }
-            return current - quantity;
-        }) != null && stock.get(itemId) < (stock.get(itemId) + quantity);
+            item.setQuantity(item.getQuantity() - quantity);
+            repo.save(item);
+            return true;
+        }).orElse(false);
     }
 }
