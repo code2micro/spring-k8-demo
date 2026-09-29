@@ -1,75 +1,54 @@
-httpRoute:
-  enabled: false
+# Default values for spring-k8-demo chart
 
-replicaCount: 2
+global:
+  imagePullPolicy: Never
 
-image:
-  repository: spring-k8-demo
-  pullPolicy: Never
-  tag: "v4"
+# ---- PostgreSQL ----
+postgres:
+  image: postgres:16-alpine
+  port: 5432
+  storage: 1Gi
+  credentials:
+    username: appuser
+    password: apppassword
 
-imagePullSecrets: []
+# ---- Redpanda (Kafka) ----
+redpanda:
+  image: docker.redpanda.com/redpandadata/redpanda:latest
+  port: 9092
+  memory: 512M
 
-nameOverride: ""
-fullnameOverride: ""
+# ---- Redis ----
+redis:
+  image: redis:7-alpine
+  port: 6379
+  maxMemory: 32mb
 
-serviceAccount:
-  create: true
-  automount: true
-  annotations: {}
-  name: ""
-
-podAnnotations: {}
-
-podLabels: {}
-
-podSecurityContext: {}
-
-securityContext: {}
-
-service:
-  type: NodePort
+# ---- api-gateway ----
+apiGateway:
+  image: api-gateway:latest
   port: 8080
+  replicas: 1
+  javaOpts: "-Xmx192m"
+  memoryLimit: "384Mi"
 
+# ---- order-service ----
+orderService:
+  image: order-service:latest
+  port: 8081
+  replicas: 1
+  javaOpts: "-Xmx192m"
+  memoryLimit: "384Mi"
+
+# ---- inventory-service ----
+inventoryService:
+  image: inventory-service:latest
+  port: 8080
+  replicas: 1
+  javaOpts: "-Xmx192m"
+  memoryLimit: "384Mi"
+
+# ---- Ingress ----
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-
-resources: {}
-
-livenessProbe:
-  httpGet:
-    path: /actuator/health
-    port: 8080
-  initialDelaySeconds: 30
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /actuator/health
-    port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 5
-
-autoscaling:
-  enabled: false
-
-volumes: []
-
-volumeMounts: []
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-persistence:
-  size: 1Gi
+  enabled: true
+  host: api.spring-k8.local

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.redis.image }}
+          args:
+            - redis-server
+            - --maxmemory
+            - {{ .Values.redis.maxMemory }}
+            - --maxmemory-policy
+            - allkeys-lru
+            - --save
+            - ""
+          ports:
+            - containerPort: {{ .Values.redis.port }}
+          resources:
+            limits:
+              memory: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: {{ .Values.redis.port }}
+      targetPort: {{ .Values.redis.port }}

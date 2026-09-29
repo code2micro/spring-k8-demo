@@ -1,0 +1,116 @@
+# ---------- api-gateway ----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: {{ .Values.apiGateway.replicas }}
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: {{ .Values.apiGateway.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.apiGateway.port }}
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.apiGateway.javaOpts | quote }}
+          resources:
+            limits:
+              memory: {{ .Values.apiGateway.memoryLimit }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+spec:
+  selector:
+    app: api-gateway
+  ports:
+    - port: {{ .Values.apiGateway.port }}
+      targetPort: {{ .Values.apiGateway.port }}
+---
+# ---------- order-service ----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: {{ .Values.orderService.replicas }}
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: {{ .Values.orderService.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.orderService.port }}
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.orderService.javaOpts | quote }}
+          resources:
+            limits:
+              memory: {{ .Values.orderService.memoryLimit }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: {{ .Values.orderService.port }}
+      targetPort: {{ .Values.orderService.port }}
+---
+# ---------- inventory-service ----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+spec:
+  replicas: {{ .Values.inventoryService.replicas }}
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      containers:
+        - name: inventory-service
+          image: {{ .Values.inventoryService.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.inventoryService.port }}
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.inventoryService.javaOpts | quote }}
+          resources:
+            limits:
+              memory: {{ .Values.inventoryService.memoryLimit }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  selector:
+    app: inventory-service
+  ports:
+    - port: {{ .Values.inventoryService.port }}
+      targetPort: {{ .Values.inventoryService.port }}
