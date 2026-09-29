@@ -19,7 +19,9 @@ public class OrderController {
 
     @GetMapping("/orders")
     public String getOrders() {
-        return "Order Service";
+        String podName = System.getenv("HOSTNAME");
+        System.out.println(">>> /orders handled by pod: " + podName);
+        return "Order Service (pod: " + podName + ")";
     }
 
     @PostMapping("/orders")
