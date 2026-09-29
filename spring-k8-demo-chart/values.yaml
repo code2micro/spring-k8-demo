@@ -52,3 +52,9 @@ inventoryService:
 ingress:
   enabled: true
   host: api.spring-k8.local
+# ---- HPA ----
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPU: 50

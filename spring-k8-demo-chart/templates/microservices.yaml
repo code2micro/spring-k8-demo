@@ -23,6 +23,9 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ .Values.apiGateway.javaOpts | quote }}
           resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
             limits:
               memory: {{ .Values.apiGateway.memoryLimit }}
 ---
@@ -62,6 +65,9 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ .Values.orderService.javaOpts | quote }}
           resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
             limits:
               memory: {{ .Values.orderService.memoryLimit }}
 ---
@@ -101,6 +107,9 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ .Values.inventoryService.javaOpts | quote }}
           resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
             limits:
               memory: {{ .Values.inventoryService.memoryLimit }}
 ---
