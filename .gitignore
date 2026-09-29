@@ -19,3 +19,10 @@ minikube-linux-amd64
 target/
 *.zip
 spring-k8-demo.zip
+# Java build artifacts
+*.class
+target/
+
+# Local IDE/tool state
+*.geanywb
+*.geany
